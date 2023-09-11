@@ -19,7 +19,7 @@
     ];
     let enabled = Array(200).fill(true);
 
-    let frequenciesAlreadyChanged = [];
+    let frequenciesAlreadyChanged = {};
 
     let points = [];
 
@@ -115,10 +115,10 @@
         points = [];
         spectrum = [];
         enabled = [];
-        frequenciesAlreadyChanged = [];
+        frequenciesAlreadyChanged = {};
     }}
     on:mousemove={(evt) => {
-        if (frequenciesAlreadyChanged.length > 0) return;
+        if (Object.keys(frequenciesAlreadyChanged).length > 0) return;
         if (evt.buttons == 0) return;
 
         // Create an SVGPoint for future math
@@ -234,7 +234,17 @@ Frequencies:
                 viewBox={`${-realWidthSpectrum(s)} ${-realWidthSpectrum(s)} ${
                     2 * realWidthSpectrum(s)
                 } ${2 * realWidthSpectrum(s)}`}
-                on:click={() => {}}
+                on:click={() => {
+                    const s = prompt(
+                        "Enter x,y for the frequency n° i to become x+yi:",
+                        spectrum[i]
+                    );
+                    spectrum[i] = s.split(",").map((is) => parseFloat(is));
+                    if(spectrum[i].length == 0)
+                        spectrum[i] = [0, 0];
+                    else
+                        spectrum[i].push(0);
+                }}
             >
                 <circle
                     cx={0}
@@ -280,6 +290,25 @@ Frequencies:
                 id={"inputCheckbox" + i}
                 type="checkbox"
                 bind:checked={enabled[i]}
+                on:mousedown={() => {
+                    frequenciesAlreadyChanged = {};
+                    frequenciesAlreadyChanged[i] = true;
+                }}
+                on:mouseleave={() => {
+                    if (Object.keys(frequenciesAlreadyChanged).length == 1) {
+                        enabled[i] = !enabled[i];
+                    }
+                }}
+                on:mousemove={(evt) => {
+                    console.log(evt.buttons);
+                    if (evt.buttons > 0 && !frequenciesAlreadyChanged[i]) {
+                        frequenciesAlreadyChanged[i] = true;
+                        enabled[i] = !enabled[i];
+                        document.getElementById("inputCheckbox" + i).checked =
+                            enabled[i];
+                        console.log("miaou");
+                    }
+                }}
             />
         </span>
     {/if}
