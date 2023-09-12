@@ -308,6 +308,8 @@ Frequencies:
                             enabled[i];
                         console.log("miaou");
                     }
+                    else
+                    frequenciesAlreadyChanged = {};
                 }}
             />
         </span>
